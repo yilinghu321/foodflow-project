@@ -36,7 +36,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     protected void addInterceptors(InterceptorRegistry registry) {
         log.info("Signing for defined interceptor...");
         registry.addInterceptor(jwtTokenAdminInterceptor)
-                .addPathPatterns("/**")
+                .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/employee/login");
     }
 

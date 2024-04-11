@@ -1,6 +1,7 @@
 package com.foodflow.controller.admin;
 
 import com.foodflow.constant.JwtClaimsConstant;
+import com.foodflow.dto.EmployeeDTO;
 import com.foodflow.dto.EmployeeLoginDTO;
 import com.foodflow.entity.Employee;
 import com.foodflow.properties.JwtProperties;
@@ -8,9 +9,10 @@ import com.foodflow.result.Result;
 import com.foodflow.service.EmployeeService;
 import com.foodflow.utils.JwtUtil;
 import com.foodflow.vo.EmployeeLoginVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/employee")
 @Slf4j
+@Tag(name = "Employee Management Api")
 public class EmployeeController {
 
     @Autowired
@@ -34,12 +37,13 @@ public class EmployeeController {
 
 
     /**
-     * 登录
+     * Employee login process.
      *
-     * @param employeeLoginDTO
-     * @return
+     * @param employeeLoginDTO the DTO of employee login data
+     * @return Result of login
      */
     @PostMapping("/login")
+    @Operation(summary = "Employee Login")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
 
@@ -61,6 +65,20 @@ public class EmployeeController {
             .build();
 
         return Result.success(employeeLoginVO);
+    }
+
+    /**
+     * Save new employee.
+     *
+     * @param employeeDTO DTO of new employee to save
+     * @return Result of saving
+     */
+    @PostMapping
+    @Operation(summary = "Add employee")
+    public Result saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("Add new employee: {}", employeeDTO);
+        employeeService.save(employeeDTO);
+        return Result.success();
     }
 
     /**
