@@ -9,54 +9,106 @@ import com.foodflow.exception.AccountLockedException;
 import com.foodflow.exception.AccountNotFoundException;
 import com.foodflow.exception.PasswordErrorException;
 import com.foodflow.service.EmployeeService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.ObjectUtils;
 
+import java.sql.Time;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeMapper employeeMapper;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @Value("${foodflow.salt}")
     private String crypToken;
 
+    private static final String LOGIN_ERROR_KEY = "login:error:";
+    private static final String LOGIN_LOCK_KEY = "login:lock:";
+
     /**
-     * 员工登录
+     * Check if the given EmployeeLoginDTO is a valid Employee;
+     * If credential is valid and the account is not locked,
+     * return the Employee, otherwise throw Exceptions.
      *
      * @param employeeLoginDTO
-     * @return
+     * @return the Employee
      */
     public Employee login(EmployeeLoginDTO employeeLoginDTO) {
         String username = employeeLoginDTO.getUsername();
         String password = employeeLoginDTO.getPassword();
 
-        //1、根据用户名查询数据库中的数据
+        checkAccountLocck(username);
+        //1、mapping through the database based on given username
         Employee employee = employeeMapper.getByUsername(username);
 
-        //2、处理各种异常情况（用户名不存在、密码不对、账号被锁定）
+        //2、handling exceptions（user not found、invalid password、account locked）
         if (employee == null) {
-            //账号不存在
+            //account not found
+            log.info("Account not found.");
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
 
-        //密码比对
+        //validate password
         password = DigestUtils.md5DigestAsHex((password + crypToken).getBytes());
 
         if (!password.equals(employee.getPassword())) {
-            //密码错误
+            //password invalid
+            log.info("Invalid password.");
+
+            //mark for invalid input of password
+            redisTemplate.opsForValue().set(getKey(username), "-", 5, TimeUnit.MINUTES);
+            Set<Object> keys = redisTemplate.keys(LOGIN_ERROR_KEY + username + ":*");
+
+            if (keys != null && keys.size() >= 5) {
+                log.info("5 attempts of invalid password in 5 min, locked for 1 hour.");
+                redisTemplate.opsForValue().set(LOGIN_LOCK_KEY + username, "+", 1, TimeUnit.HOURS);
+            }
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
 
         if (employee.getStatus() == StatusConstant.DISABLE) {
-            //账号被锁定
+            //account locked
+            log.info("Account locked.");
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
 
-        //3、返回实体对象
+        //3、return the employee
         return employee;
+    }
+
+    /**
+     * Check if the given account to check is locked.
+     * @param username username of the given account the check
+     */
+    private void checkAccountLocck(String username) {
+        Object lockFlag = redisTemplate.opsForValue().get(LOGIN_LOCK_KEY + username);
+        if (!ObjectUtils.isEmpty(lockFlag)) {
+            log.info("5 attempts of invalid password in 5 min, locked for 1 hour.");
+            throw new AccountLockedException(MessageConstant.ACCOUNT_LOGIN_LOCKED);
+        };
+    }
+
+    /**
+     * Generate key for redis storing user with invalid attempt of log in
+     * @param username the username
+     * @return String of redis key
+     */
+    private static String getKey(String username) {
+        return LOGIN_ERROR_KEY + username + ":" + RandomStringUtils.randomAlphabetic(5);
     }
 
 }

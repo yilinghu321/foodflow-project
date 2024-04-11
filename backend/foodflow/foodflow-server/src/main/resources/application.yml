@@ -13,6 +13,12 @@ spring:
       username: ${foodflow.datasource.username}
       password: ${foodflow.datasource.password}
       type: com.alibaba.druid.pool.DruidDataSource
+  data:
+    redis:
+      host: ${foodflow.redis.host}
+      port: ${foodflow.redis.port}
+      database: ${foodflow.redis.database}
+      password: ${foodflow.redis.password}
 
 mybatis:
   #mapper配置文件
