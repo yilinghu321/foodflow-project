@@ -1,4 +1,4 @@
-package com.sky.constant;
+package com.foodflow.constant;
 
 /**
  * 公共字段自动填充相关常量

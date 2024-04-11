@@ -1,4 +1,4 @@
-package com.sky.constant;
+package com.foodflow.constant;
 
 public class JwtClaimsConstant {
 

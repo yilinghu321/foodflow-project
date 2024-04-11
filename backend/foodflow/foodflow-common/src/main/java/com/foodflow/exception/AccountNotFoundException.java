@@ -1,4 +1,4 @@
-package com.sky.exception;
+package com.foodflow.exception;
 
 /**
  * 账号不存在异常

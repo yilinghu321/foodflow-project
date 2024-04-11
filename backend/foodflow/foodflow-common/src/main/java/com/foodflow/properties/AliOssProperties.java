@@ -1,11 +1,11 @@
-package com.sky.properties;
+package com.foodflow.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "sky.alioss")
+@ConfigurationProperties(prefix = "foodflow.alioss")
 @Data
 public class AliOssProperties {
 

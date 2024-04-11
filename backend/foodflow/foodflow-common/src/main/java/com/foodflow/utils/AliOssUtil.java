@@ -1,4 +1,4 @@
-package com.sky.utils;
+package com.foodflow.utils;
 
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;

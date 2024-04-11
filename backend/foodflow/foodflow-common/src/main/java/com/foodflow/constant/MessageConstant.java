@@ -1,4 +1,4 @@
-package com.sky.constant;
+package com.foodflow.constant;
 
 /**
  * 信息提示常量类

@@ -1,12 +1,11 @@
-package com.sky.properties;
+package com.foodflow.properties;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "sky.wechat")
+@ConfigurationProperties(prefix = "foodflow.wechat")
 @Data
 public class WeChatProperties {
 

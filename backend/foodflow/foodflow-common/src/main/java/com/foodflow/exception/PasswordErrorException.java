@@ -1,4 +1,4 @@
-package com.sky.exception;
+package com.foodflow.exception;
 
 /**
  * 密码错误异常
