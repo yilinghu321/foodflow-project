@@ -46,11 +46,11 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
         //1、从请求头中获取令牌
         String token = request.getHeader(jwtProperties.getAdminTokenName());
 
-        if (!StringUtils.hasLength(token)) {
-            log.info("No token found.");
-            response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-            return false;
-        }
+//        if (!StringUtils.hasLength(token)) {
+//            log.info("No token found.");
+//            response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+//            return false;
+//        }
 
         //2、校验令牌
         try {

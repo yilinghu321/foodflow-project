@@ -31,8 +31,7 @@ public class EmployeeController {
     private EmployeeService employeeService;
     @Autowired
     private JwtProperties jwtProperties;
-    @Value("${foodflow.salt}")
-    private String crypToken;
+
 
     /**
      * 登录
